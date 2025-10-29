@@ -1,3 +1,68 @@
+/* Service Worker de notificaciones para Administración SE */
+
+self.addEventListener('install', (event) => {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim());
+});
+
+// Mostrar notificaciones entrantes via Web Push
+self.addEventListener('push', (event) => {
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch (_) {}
+
+  const title = data.title || 'Notificación';
+  const options = {
+    body: data.body || '',
+    icon: data.icon || '/favicon.ico',
+    data: data.data || {},
+    tag: data.tag || `notif_${Date.now()}`,
+    renotify: true,
+    badge: data.badge || '/favicon.ico'
+  };
+
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+// Click en la notificación
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = (event.notification.data && event.notification.data.url) || '/';
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      // Si ya hay una pestaña, enfocarla
+      for (const client of clientList) {
+        if ('focus' in client) {
+          client.focus();
+          client.postMessage({ type: 'OPEN_URL', url });
+          return;
+        }
+      }
+      // O abrir una nueva
+      if (self.clients.openWindow) {
+        return self.clients.openWindow(url);
+      }
+    })
+  );
+});
+
+// Mensajes desde la página para mostrar notificaciones locales
+self.addEventListener('message', (event) => {
+  const msg = event.data || {};
+  if (msg.type === 'SHOW_NOTIFICATION') {
+    self.registration.showNotification(msg.title || 'Notificación', {
+      body: msg.body || '',
+      icon: msg.icon || '/favicon.ico',
+      data: msg.data || {},
+      tag: msg.tag || `notif_${Date.now()}`
+    });
+  }
+});
+
 // Service Worker para Notificaciones Push
 // Este archivo maneja las notificaciones push del navegador
 
