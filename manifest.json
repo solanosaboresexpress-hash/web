@@ -1,0 +1,20 @@
+{
+  "short_name": "AdminSE",
+  "name": "Administración SE - Sistema de Gestión",
+  "description": "Sistema de administración para locales comerciales con gestión de pendientes y gastos",
+  "icons": [
+    {
+      "src": "logo_sabores_real.png",
+      "type": "image/png",
+      "sizes": "64x64 32x32 24x24 16x16 192x192 512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#1976d2",
+  "background_color": "#ffffff",
+  "orientation": "portrait-primary",
+  "categories": ["productivity", "business"],
+  "lang": "es",
+  "dir": "ltr"
+}
